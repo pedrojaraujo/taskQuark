@@ -1,20 +1,24 @@
 package org.pedrojaraujo;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
 import jakarta.persistence.*;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.validation.constraints.NotBlank;
+;
 
 
 @Entity
 public class Category extends PanacheEntity {
 
+    @Column(nullable = false, unique = true)
+    @NotBlank(message = "O nome da categoria é necessário.")
     private String name;
 
 
     //Relacionamento
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
 
     // Getters e Setters

@@ -2,15 +2,27 @@ package org.pedrojaraujo;
 
 import jakarta.persistence.*;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.validation.constraints.NotBlank;
+
+import java.time.LocalDate;
 
 
 @Entity
 public class Task extends PanacheEntity {
 
-
+    @Column(nullable = false)
+    @NotBlank(message = "É necessário um título")
     private String title;
+
     private String description;
+
+    @Column(nullable = false)
     private boolean completed;
+
+
+    private int priority; // 1 (baixa), 2(média), 3(alta)
+
+    private LocalDate dueDate;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -39,6 +51,30 @@ public class Task extends PanacheEntity {
         this.description = description;
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
     public Category getCategory() {
         return category;
     }
@@ -55,11 +91,4 @@ public class Task extends PanacheEntity {
         this.user = user;
     }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
 }
