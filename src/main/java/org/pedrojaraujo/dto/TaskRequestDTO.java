@@ -2,6 +2,9 @@ package org.pedrojaraujo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.pedrojaraujo.Category;
+import org.pedrojaraujo.TaskUser;
+import org.pedrojaraujo.validation.ValidPriority;
 
 public class TaskRequestDTO {
     @NotBlank(message = "O título é obrigatório.")
@@ -13,11 +16,10 @@ public class TaskRequestDTO {
     public Boolean completed;
 
     @NotNull(message = "A prioridade é obrigatória.")
+    @ValidPriority
     public Integer priority;
 
-    @NotNull(message = "O ID da categoria é obrigatório.")
     public Long category_id;
 
-    @NotNull(message = "O ID do usuário é obrigatório.")
     public Long user_id;
 }

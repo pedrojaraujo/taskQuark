@@ -68,13 +68,13 @@ public class TaskController {
             task.setCompleted(dto.completed);
             task.setPriority(dto.priority);
 
-            Category category = categoryRepository.findById(dto.category_id);
+            Category category = Category.findById(dto.category_id);
             if (category == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Categoria com ID " + dto.category_id + " não encontrada.").build();
             }
 
-            TaskUser user = userRepository.findById(dto.user_id);
+            TaskUser user = TaskUser.findById(dto.user_id);
             if (user == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Usuário com ID " + dto.user_id + " não encontrado.").build();
@@ -100,7 +100,7 @@ public class TaskController {
                         .entity("A lista de tarefas está vazia.").build();
             }
 
-            List<Task> tasks = new ArrayList<>();
+            List<TaskRequestDTO> tasks = new ArrayList<>();
 
             for (TaskRequestDTO dto : taskDTOs) {
                 Task task = new Task();
@@ -110,13 +110,13 @@ public class TaskController {
                 task.setPriority(dto.priority);
 
                 // Buscar entidades existentes pelo ID
-                Category category = categoryRepository.findById(dto.category_id);
+                Category category = Category.findById(dto.category_id);
                 if (category == null) {
                     return Response.status(Response.Status.BAD_REQUEST)
                             .entity("Categoria com ID " + dto.category_id + " não encontrada.").build();
                 }
 
-                TaskUser user = userRepository.findById(dto.user_id);
+                TaskUser user = TaskUser.findById(dto.user_id);
                 if (user == null) {
                     return Response.status(Response.Status.BAD_REQUEST)
                             .entity("Usuário com ID " + dto.user_id + " não encontrado.").build();
@@ -126,7 +126,16 @@ public class TaskController {
                 task.setUser(user);
 
                 taskRepository.persistAndFlush(task);
-                tasks.add(task);
+
+                TaskRequestDTO taskDTO = new TaskRequestDTO();
+                taskDTO.title = task.getTitle();
+                taskDTO.description = task.getDescription();
+                taskDTO.completed = task.isCompleted();
+                taskDTO.priority = task.getPriority();
+                taskDTO.category_id = task.getCategory().id;
+                taskDTO.user_id = task.getUser().id;
+
+                tasks.add(taskDTO);
             }
 
             return Response.status(Response.Status.CREATED).entity(tasks).build();
@@ -136,7 +145,6 @@ public class TaskController {
                     .entity("Erro ao salvar as tarefas: " + e.getMessage()).build();
         }
     }
-
 
     @DELETE
     @Path("/{id}")
