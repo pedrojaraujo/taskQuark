@@ -1,10 +1,11 @@
-FROM ubuntu:latest
+FROM eclipse-temurin:23-jdk
 LABEL authors="pedro.araujo@finnet.corp"
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+COPY . .
+RUN mvn clean package -DskipTests
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "target/*.jar"]
