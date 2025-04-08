@@ -1,16 +1,14 @@
-FROM eclipse-temurin:23-jdk
-LABEL authors="pedro.araujo@finnet.corp"
+FROM registry.access.redhat.com/ubi8/openjdk-21:latest
 
 WORKDIR /app
 
-# Instalar Maven
-RUN apt-get update && \
-    apt-get install -y maven
-
-COPY . .
-RUN mvn clean package -DskipTests
+COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployments/
+COPY --chown=185 target/quarkus-app/app/ /deployments/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
+ENV PORT=8080
+ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
-# Use o caminho exato para o JAR em vez de um padrão glob
-CMD ["sh", "-c", "java -jar target/*.jar"]
+CMD ["java", "-jar", "/deployments/quarkus-run.jar"]

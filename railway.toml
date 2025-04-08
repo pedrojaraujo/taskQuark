@@ -2,6 +2,6 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "java -jar target/*.jar"
-healthcheckPath = "/"
+startCommand = "java -jar target/quarkus-app/quarkus-run.jar"
+healthcheckPath = "/q/health"
 healthcheckTimeout = 300
