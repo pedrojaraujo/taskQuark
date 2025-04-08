@@ -8,10 +8,8 @@ public class TaskResponseDTO {
     public String description;
     public Boolean completed;
     public Integer priority;
-    public String categoryName;
-    public Long categoryId;
-    public String userName;
-    public Long userId;
+    public Long user_id;
+    private Long category_id;
 
     public static TaskResponseDTO fromEntity(Task task) {
         TaskResponseDTO dto = new TaskResponseDTO();
@@ -20,8 +18,16 @@ public class TaskResponseDTO {
         dto.description = task.getDescription();
         dto.completed = task.isCompleted();
         dto.priority = task.getPriority();
-        dto.categoryId = task.getCategory().id;
-        dto.userId = task.getUser().id;
+        dto.category_id = task.getCategory().id;
+        dto.user_id= task.getUser().id;
         return dto;
+    }
+
+    public Long getCategory_id() {
+        return category_id;
+    }
+
+    public void setCategory_id(Long category_id) {
+        this.category_id = category_id;
     }
 }
