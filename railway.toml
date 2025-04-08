@@ -1,7 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-
-[deploy]
-startCommand = "java -jar /deployments/quarkus-run.jar"
-healthcheckPath = "/q/health"
-healthcheckTimeout = 300
