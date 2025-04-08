@@ -11,11 +11,13 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.TaskUser;
 import org.pedrojaraujo.dto.UserRequestDTO;
+import org.pedrojaraujo.dto.UserResponseDTO;
 import org.pedrojaraujo.repositories.UserRepository;
 import org.pedrojaraujo.utils.DeleteUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Path("/users")
@@ -29,10 +31,12 @@ public class UserController {
 
     @GET
     @Operation(summary = "Lista todos os usuários.", description = "Mostra a lista de todos os usuários.")
-    public List<TaskUser> getUsers() {
+    public List<UserResponseDTO> getUsers() {
         try {
-            return userRepository.listAll();
-        } catch (Exception e) {
+            return userRepository.listAll().stream()
+                    .map(UserResponseDTO::fromEntity)
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
@@ -40,12 +44,21 @@ public class UserController {
     @GET
     @Path("/{id}")
     @Operation(summary = "Lista usuário por ID.", description = "Mostra o usuário correspondente ao ID fornecido.")
-     public TaskUser getUsersById(@PathParam("id") long id) {
+     public Response getUsersById(@PathParam("id") long id) {
 
         try {
-            return userRepository.findById(id);
+            TaskUser user = userRepository.findById(id);
+
+            if ( user == null ) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Tarefa com ID " + id + " não encontrada.").build();
+            }
+            UserResponseDTO dto = UserResponseDTO.fromEntity(user);
+            return Response.ok(dto).build();
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar a tarefa: " + e.getMessage()).build();
         }
     }
 

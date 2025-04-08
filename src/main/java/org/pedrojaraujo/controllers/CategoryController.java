@@ -11,11 +11,13 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.Category;
 import org.pedrojaraujo.dto.CategoryRequestDTO;
+import org.pedrojaraujo.dto.CategoryResponseDTO;
 import org.pedrojaraujo.repositories.CategoryRepository;
 import org.pedrojaraujo.utils.DeleteUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Path("/categories")
@@ -29,15 +31,32 @@ public class CategoryController {
 
     @GET
     @Operation(summary = "Lista todas as categorias.", description = "Mostra a lista de todas as categorias.")
-    public List<Category> getCategories() {
-        return categoryRepository.listAll();
+    public List<CategoryResponseDTO> getCategories() {
+       try {
+           return categoryRepository.listAll().stream()
+                   .map(CategoryResponseDTO::fromEntity)
+                   .collect(Collectors.toList());
+       } catch ( RuntimeException e) {
+           throw new RuntimeException(e);
+       }
     }
 
     @GET
     @Path("/{id}")
     @Operation(summary = "Lista categoria por ID.", description = "Mostra a lista categoria por ID.")
-    public Category getCategoriesById(@PathParam("id") Long id) {
-        return categoryRepository.findById(id);
+    public Response getCategoriesById(@PathParam("id") Long id) {
+        try {
+            Category category = categoryRepository.findById(id);
+            if (category == null) {
+                return  Response.status(Response.Status.NOT_FOUND)
+                        .entity("Categoria com ID" + id + " não encotrada.").build();
+            }
+            CategoryResponseDTO dto = CategoryResponseDTO.fromEntity(category);
+            return Response.ok(dto).build();
+        } catch (Exception e ) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar a tarefa: " + e.getMessage()).build();
+        }
     }
 
     @POST
