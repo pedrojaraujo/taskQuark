@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.Category;
 import org.pedrojaraujo.Task;
@@ -35,6 +36,7 @@ public class TaskController {
     UserRepository userRepository;
 
     @GET
+    @Operation(summary = "Lista todas as tarefas.", description = "Mostra a lista de todas as tarefas.")
     public List<Task> getTasks() {
         try {
             return taskRepository.listAll();
@@ -45,6 +47,7 @@ public class TaskController {
 
     @GET
     @Path("/{id}")
+    @Operation(summary = "Lista tarefa por ID.", description = "Mostra a tarefa correspondente ao ID fornecido.")
     public Task getTaskById(@PathParam("id") Long id) {
         try {
             return taskRepository.findById(id);
@@ -55,6 +58,7 @@ public class TaskController {
 
     @PUT
     @Path("/{id}")
+    @Operation(summary = "Atualiza tarefa por ID.", description = "Atualiza a tarefa correspondente ao ID fornecido.")
     public Response updateTask(@PathParam("id") Long id, @Valid TaskRequestDTO dto) {
         try {
             Task task = taskRepository.findById(id);
@@ -93,6 +97,7 @@ public class TaskController {
 
     @POST
     @Transactional
+    @Operation(summary = "Cria tarefas.", description = "Cria uma ou mais tarefas através de uma lista.")
     public Response createTask(@Valid List<TaskRequestDTO> taskDTOs) {
         try {
             if (taskDTOs.isEmpty()) {
@@ -148,6 +153,7 @@ public class TaskController {
 
     @DELETE
     @Path("/{id}")
+    @Operation(summary = "Deleta tarefa por ID.", description = "Deleta a tarefa correspondente ao ID fornecido.")
     public Response deleteTask(@PathParam("id") Long id) {
         return DeleteUtil.deleteEntity(()-> taskRepository.deleteById(id), "Tarefa");
     }

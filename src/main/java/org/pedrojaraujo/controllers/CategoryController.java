@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.Category;
 import org.pedrojaraujo.dto.CategoryRequestDTO;
@@ -27,18 +28,21 @@ public class CategoryController {
     CategoryRepository categoryRepository;
 
     @GET
+    @Operation(summary = "Lista todas as categorias.", description = "Mostra a lista de todas as categorias.")
     public List<Category> getCategories() {
         return categoryRepository.listAll();
     }
 
     @GET
     @Path("/{id}")
+    @Operation(summary = "Lista categoria por ID.", description = "Mostra a lista categoria por ID.")
     public Category getCategoriesById(@PathParam("id") Long id) {
         return categoryRepository.findById(id);
     }
 
     @POST
     @Transactional
+    @Operation(summary = "Cria categorias.", description = "Cria uma ou mais categorias através de uma lista.")
     public Response create(@Valid List<CategoryRequestDTO> categoryDTOs) {
 
         if (categoryDTOs == null || categoryDTOs.isEmpty()) {
@@ -77,6 +81,7 @@ public class CategoryController {
 
     @PUT
     @Path("/{id}")
+    @Operation(summary = "Atualiza a categoria por ID.", description = "Atualiza a categoria pelo ID apontado.")
     public Response update(@PathParam("id") Long id, @Valid CategoryRequestDTO updateDTO) {
         try {
             Category category = categoryRepository.findById(id);
@@ -99,6 +104,7 @@ public class CategoryController {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @Operation(summary = "Deleta a categoria por ID.", description = "Deleta a categoria pelo ID apontado.")
     public Response deleteCategory(@PathParam("id") Long id) {
 
         return DeleteUtil.deleteEntity(()-> categoryRepository.deleteById(id), "Categoria");

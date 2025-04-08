@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.TaskUser;
 import org.pedrojaraujo.dto.UserRequestDTO;
@@ -27,6 +28,7 @@ public class UserController {
     UserRepository userRepository;
 
     @GET
+    @Operation(summary = "Lista todos os usuários.", description = "Mostra a lista de todos os usuários.")
     public List<TaskUser> getUsers() {
         try {
             return userRepository.listAll();
@@ -37,7 +39,8 @@ public class UserController {
 
     @GET
     @Path("/{id}")
-    public TaskUser getUsersById(@PathParam("id") long id) {
+    @Operation(summary = "Lista usuário por ID.", description = "Mostra o usuário correspondente ao ID fornecido.")
+     public TaskUser getUsersById(@PathParam("id") long id) {
 
         try {
             return userRepository.findById(id);
@@ -48,6 +51,7 @@ public class UserController {
 
     @POST
     @Transactional
+    @Operation(summary = "Cria usuários.", description = "Cria um ou mais usuários através de uma lista.")
     public Response createUser(@Valid List<UserRequestDTO> userDTOs) {
 
         if (userDTOs == null || userDTOs.isEmpty()) {
@@ -86,6 +90,7 @@ public class UserController {
 
     @PUT
     @Path("/{id}")
+    @Operation(summary = "Atualiza usuário por ID.", description = "Atualiza o usuário correspondente ao ID fornecido.")
     public Response updateUser(@PathParam("id") Long id, @Valid UserRequestDTO updateDTO) {
         try {
             TaskUser user = userRepository.findById(id);
@@ -108,6 +113,7 @@ public class UserController {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @Operation(summary = "Deleta usuário por ID.", description = "Deleta o usuário correspondente ao ID fornecido.")
     public Response deleteUser(@PathParam("id") Long id) {
         return DeleteUtil.deleteEntity(()-> userRepository.deleteById(id), "Usuário");
     }
