@@ -14,6 +14,7 @@ import org.pedrojaraujo.Category;
 import org.pedrojaraujo.Task;
 import org.pedrojaraujo.TaskUser;
 import org.pedrojaraujo.dto.TaskRequestDTO;
+import org.pedrojaraujo.dto.TaskResponseDTO;
 import org.pedrojaraujo.repositories.CategoryRepository;
 import org.pedrojaraujo.repositories.TaskRepository;
 import org.pedrojaraujo.repositories.UserRepository;
@@ -21,6 +22,7 @@ import org.pedrojaraujo.utils.DeleteUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/tasks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,9 +39,11 @@ public class TaskController {
 
     @GET
     @Operation(summary = "Lista todas as tarefas.", description = "Mostra a lista de todas as tarefas.")
-    public List<Task> getTasks() {
+    public List<TaskResponseDTO> getTasks() {
         try {
-            return taskRepository.listAll();
+            return taskRepository.listAll().stream()
+                    .map(TaskResponseDTO::fromEntity)
+                    .collect(Collectors.toList());
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
@@ -48,11 +52,19 @@ public class TaskController {
     @GET
     @Path("/{id}")
     @Operation(summary = "Lista tarefa por ID.", description = "Mostra a tarefa correspondente ao ID fornecido.")
-    public Task getTaskById(@PathParam("id") Long id) {
+    public Response getTaskById(@PathParam("id") Long id) {
         try {
-            return taskRepository.findById(id);
+            Task task = taskRepository.findById(id);
+            if (task == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Tarefa com ID " + id + " não encontrada.").build();
+            }
+
+            TaskResponseDTO dto = TaskResponseDTO.fromEntity(task);
+            return Response.ok(dto).build();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar a tarefa: " + e.getMessage()).build();
         }
     }
 
