@@ -10,6 +10,7 @@ public class UserResponseDTO {
     public Long id;
     public String name;
     public String email;
+    public String password;
     public List<TaskSummaryDTO> tasks;
 
     public static UserResponseDTO fromEntity(TaskUser user) {
@@ -17,6 +18,7 @@ public class UserResponseDTO {
         dto.id = user.id;
         dto.name = user.getName();
         dto.email = user.getEmail();
+        dto.password = user.getPassword();
 
         if (user.getTasks() != null) {
             dto.tasks = user.getTasks().stream()

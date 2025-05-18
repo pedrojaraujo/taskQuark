@@ -1,6 +1,7 @@
 package org.pedrojaraujo;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,6 +23,17 @@ public class TaskUser extends PanacheEntity {
     @Email(message = "Email inválido")
     @NotBlank(message = "Email é obrigatório")
     private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(unique = true)
+    private String apiKey;
+
+    // Gerar API Key
+    public void generateApiKey() {
+        this.apiKey = UUID.randomUUID().toString();
+    }
 
     //Relacionamento
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,5 +62,21 @@ public class TaskUser extends PanacheEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

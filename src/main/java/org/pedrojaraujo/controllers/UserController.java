@@ -79,6 +79,8 @@ public class UserController {
                 TaskUser user = new TaskUser();
                 user.setName(dto.name);
                 user.setEmail(dto.email);
+                user.setPassword(dto.password);
+                user.generateApiKey();
                 userRepository.persistAndFlush(user);
                 users.add(user);
             }

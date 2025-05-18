@@ -1,5 +1,6 @@
 package org.pedrojaraujo.controllers;
 
+import io.smallrye.faulttolerance.api.RateLimit;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.pedrojaraujo.Category;
@@ -14,7 +16,7 @@ import org.pedrojaraujo.dto.CategoryRequestDTO;
 import org.pedrojaraujo.dto.CategoryResponseDTO;
 import org.pedrojaraujo.repositories.CategoryRepository;
 import org.pedrojaraujo.utils.DeleteUtil;
-
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ public class CategoryController {
     CategoryRepository categoryRepository;
 
     @GET
+    @Path("/public")
     @Operation(summary = "Lista todas as categorias.", description = "Mostra a lista de todas as categorias.")
     public List<CategoryResponseDTO> getCategories() {
        try {
@@ -42,7 +45,9 @@ public class CategoryController {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/public/{id}")
+    @RateLimit(value = 5, window = 1, windowUnit = ChronoUnit.MINUTES)
+    @Fallback(fallbackMethod = "fallbackParaRateLimit")
     @Operation(summary = "Lista categoria por ID.", description = "Mostra a lista categoria por ID.")
     public Response getCategoriesById(@PathParam("id") Long id) {
         try {
@@ -127,5 +132,13 @@ public class CategoryController {
     public Response deleteCategory(@PathParam("id") Long id) {
 
         return DeleteUtil.deleteEntity(()-> categoryRepository.deleteById(id), "Categoria");
+    }
+
+
+
+    public Response fallbackParaRateLimit(Long id) {
+        return Response.status(Response.Status.TOO_MANY_REQUESTS)
+                .entity("Limite de requisições excedido. Tente novamente mais tarde.")
+                .build();
     }
 }
